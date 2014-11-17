@@ -82,3 +82,47 @@ class Boids(object):
             me.position+=me.velocity
 
 
+class Bird(object):
+    def __init__(self,x,y,xv,yv,owner):
+        self.position=array([x,y])
+        self.velocity=array([xv,yv])
+        self.owner=owner
+
+
+class Eagle(Bird):
+    def __init__(self,x,y,xv,yv,owner,eagle_hunt_strength = 0.00005):
+        super(Eagle,self).__init__(x,y,xv,yv,owner)
+        self.species = 'Eagle'
+    #going to re-define the 'interaction'
+    def interaction(self,other):
+        separation= other.position-self.position
+        delta_v = separation*eagle_hunt_strength
+        return delta_v
+
+class Starling(Bird):
+    def __init__(self,x,y,xv,yv,owner):
+        super(Starling,self).__init__(x,y,xv,yv,owner)
+        self.species = 'Starling'
+    
+    def interaction(self,other):
+        delta_v=array([0.0,0.0])
+        separation=other.position-self.position
+        separation_sq=separation.dot(separation)
+        if other.species=="Eagle":
+            # Flee the Eagle
+            if separation_sq < self.owner.eagle_avoidance_radius**2:
+                delta_v-=(separation*self.owner.eagle_fear)/separation.dot(separation)
+                return delta_v
+        else:
+            # Fly towards the middle
+            delta_v+=separation*self.owner.flock_attraction
+            
+            # Fly away from nearby boids
+            if separation_sq < self.owner.avoidance_radius**2:
+                delta_v-=separation
+            
+            # Try to match speed with nearby boids
+            if separation_sq < self.owner.formation_flying_radius**2:
+                delta_v+=(other.velocity-self.velocity)*self.owner.speed_matching_strength
+
+        return delta_v

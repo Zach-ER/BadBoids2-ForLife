@@ -66,7 +66,7 @@ class Boids(object):
                 random.uniform(-20.0,20.0),self) for i in range(count)]
 
     def add_eagle(self,x,y,xv,yv):
-        self.boids.append(Boid(x,y,xv,yv,self,species="Eagle"))
+        self.boids.append(Eagle(x,y,xv,yv,self))
 
     def initialise_from_data(self,data):
         self.boids=[Boid(x,y,xv,yv,self) for x,y,xv,yv in zip(*data)]
@@ -92,11 +92,12 @@ class Bird(object):
 class Eagle(Bird):
     def __init__(self,x,y,xv,yv,owner,eagle_hunt_strength = 0.00005):
         super(Eagle,self).__init__(x,y,xv,yv,owner)
+        self.eagle_hunt_strength=eagle_hunt_strength
         self.species = 'Eagle'
     #going to re-define the 'interaction'
     def interaction(self,other):
         separation= other.position-self.position
-        delta_v = separation*eagle_hunt_strength
+        delta_v = separation*self.eagle_hunt_strength
         return delta_v
 
 class Starling(Bird):

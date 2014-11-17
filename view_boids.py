@@ -1,20 +1,20 @@
-from boids import Boids
+from boids import ModelBuilder
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
-boids=Boids(
-        flock_attraction=0.01/50,
-        avoidance_radius=10,
-        formation_flying_radius=100,
-        speed_matching_strength=0.125/50
-    )
 
-boids.initialise_random(50)
-boids.add_eagle(0,0,0,50)
+builda = ModelBuilder()
+builda.start_model()
+builda.set_starling_params(.01/50,10,100,.125/50)
+builda.set_eagleish_params(100,5000,.00005)
+builda.initialise_random(50)
+builda.add_eagle(0,0,0,50)
+Boids_Model = builda.finish()
+
 
 figure=plt.figure()
 axes=plt.axes(xlim=(-2000,1500), ylim=(-500,4000))
-scatter=axes.scatter([b.position[0] for b in boids.boids],[b.position[1] for b in boids.boids])
+scatter=axes.scatter([b.position[0] for b in Boids_Model.boids],[b.position[1] for b in Boids_Model.boids])
 
 def color(boid):
 	if boid.species=="Eagle":
@@ -22,9 +22,9 @@ def color(boid):
 	return (0,0,1)
 
 def animate(frame):
-    boids.update()
-    scatter.set_offsets([b.position for b in boids.boids])
-    scatter.set_color([color(b) for b in boids.boids])
+    Boids_Model.update()
+    scatter.set_offsets([b.position for b in Boids_Model.boids])
+    scatter.set_color([color(b) for b in Boids_Model.boids])
 
 
 anim = animation.FuncAnimation(figure, animate,

@@ -7,32 +7,33 @@ import random
 from numpy import array
 
 # Beautifully-polished code.
-class Boids(object):
-    def __init__(self,
-           flock_attraction,avoidance_radius,
-            formation_flying_radius,speed_matching_strength,
-            eagle_avoidance_radius=100, eagle_fear=5000, eagle_hunt_strength=0.00005):
+
+# NOTE: I know that the builder is probably wrong - couldn't get the 'mock' environment to work. 
+
+#   def initialise_from_data(self,data):
+#        self.boids=[Starling(x,y,xv,yv,self) for x,y,xv,yv in zip(*data)]
+
+
+class ModelBuilder(object):
+    def start_model(self):
+        pass
+    def set_starling_params(self,flock_attraction,avoidance_radius,
+                            formation_flying_radius,speed_matching_strength):
         self.flock_attraction=flock_attraction
         self.avoidance_radius=avoidance_radius
         self.formation_flying_radius=formation_flying_radius
         self.speed_matching_strength=speed_matching_strength
+    def set_eagleish_params(self,eagle_avoidance_radius,eagle_fear,eagle_hunt_strength):
         self.eagle_avoidance_radius=eagle_avoidance_radius
         self.eagle_fear=eagle_fear
         self.eagle_hunt_strength=eagle_hunt_strength
-
-
     def initialise_random(self,count):
         self.boids=[Starling(random.uniform(-450,50.0),
-                random.uniform(300.0,600.0),
-                random.uniform(0,10.0),
-                random.uniform(-20.0,20.0),self) for i in range(count)]
-
+                             random.uniform(300.0,600.0),
+                             random.uniform(0,10.0),
+                             random.uniform(-20.0,20.0),self) for i in range(count)]
     def add_eagle(self,x,y,xv,yv):
         self.boids.append(Eagle(x,y,xv,yv,self))
-
-    def initialise_from_data(self,data):
-        self.boids=[Starling(x,y,xv,yv,self) for x,y,xv,yv in zip(*data)]
-
     def update(self):
         for me in self.boids:
             delta_v=array([0.0,0.0])
@@ -42,7 +43,8 @@ class Boids(object):
             me.velocity+=delta_v
             # Move according to velocities
             me.position+=me.velocity
-
+    def finish(self):
+        return self
 
 class Bird(object):
     def __init__(self,x,y,xv,yv,owner):
@@ -66,7 +68,7 @@ class Starling(Bird):
     def __init__(self,x,y,xv,yv,owner):
         super(Starling,self).__init__(x,y,xv,yv,owner)
         self.species = 'Starling'
-    
+    #this one has starling-type interaction
     def interaction(self,other):
         delta_v=array([0.0,0.0])
         separation=other.position-self.position
